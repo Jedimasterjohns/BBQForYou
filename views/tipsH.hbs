@@ -1,0 +1,144 @@
+<script language="JavaScript">
+    function showform(form) {
+        if (form == 'insert') {
+            document.getElementById('browse').style.display = 'none';
+            document.getElementById('insert').style.display = 'block';
+            document.getElementById('update').style.display = 'none';
+            document.getElementById('delete').style.display = 'none';
+
+        }
+        else if (form == 'update') {
+            document.getElementById('browse').style.display = 'none';
+            document.getElementById('insert').style.display = 'none';
+            document.getElementById('update').style.display = 'block';
+            document.getElementById('delete').style.display = 'none';
+
+        }
+        else if (form == 'delete') {
+            document.getElementById('browse').style.display = 'none';
+            document.getElementById('insert').style.display = 'none';
+            document.getElementById('update').style.display = 'none';
+            document.getElementById('delete').style.display = 'block';
+        }
+        else if (form == 'all') {
+            document.getElementById('browse').style.display = 'block';
+            document.getElementById('insert').style.display = 'block';
+            document.getElementById('update').style.display = 'block';
+            document.getElementById('delete').style.display = 'block';
+
+        }
+        else {
+            document.getElementById('browse').style.display = 'block';
+            document.getElementById('insert').style.display = 'none';
+            document.getElementById('update').style.display = 'none';
+            document.getElementById('delete').style.display = 'none';
+        }
+    }
+    function insert() { showform('insert'); }
+    function update(ids) {
+        showform('update');
+        document.getElementById('insert-tipID').value = ids[0]
+        document.getElementById('insert-protein').value = ids[1]
+        document.getElementById('insert-tipText').value = ids[2]
+    }
+    function remove(ids) {
+        showform('delete');
+        console.log(ids)
+        document.getElementById('deleteTipID').value = ids
+        document.getElementById('deleteTipID-label').textContent = ids
+    }
+    function browse() { showform('browse'); }
+    function showAll() { showform('all'); }
+</script>
+
+
+
+
+<title>BBQ Tips</title>
+<div id="browse">
+    {{!-- <p><a href="#" onClick="showAll()">Display all forms</a> </p> --}}
+    <div class="row justify-content-center">
+        <div class="col-auto">
+            <table id="tip-table" border="1" cellpadding="5">
+
+                {{!-- Header section --}}
+                <thead>
+
+                    {{!-- For just the first row, we print each key of the row object as a header cell so we know what each column means when the page renders --}}
+                    <tr>
+                        <th><a href="#" onClick="insert()">New</a></th>
+                        <th></th>
+                        {{#each data.[0]}}
+                        <th>
+                            {{@key}}
+                        </th>
+                        {{/each}}
+                    </tr>
+                </thead>
+
+                {{!-- Body section --}}
+                <tbody>
+
+                    {{!-- For each row, print the id, protein, and text of tip --}}
+                    {{#each data}}
+
+                    <tr>
+                        <td><a href="#" onClick="update(['{{this.tipID}}','{{this.protein}}','{{this.tipText}}'])">Edit</a></td>
+                        <td><a href="#" onclick="remove({{this.tipID}})">Delete</a></td>
+                        <td>{{this.tipID}}</td>
+                        <td>{{this.protein}}</td>
+                        <td>{{this.tipText}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+    <p>&nbsp;</p>
+
+</div>
+
+<div id="wrap" class="col-md-12 school-options-dropdown text-center">
+    <div id="insert">
+        <form id="insertTip" method="POST" action="/add-tip-form">
+            <legend><strong>Add Tip</strong></legend>
+            <fieldset class="fields">
+                <label> Protein </label>
+                <input type="text" name="protein" id="protein">
+                <label> Tip </label>
+                <input type="text" name="tipText" id="tipText">
+            </fieldset>
+
+            <input class="btn btn-primary shadow-none" type="submit" id="addTip" value="Add Tip">
+            <input class="btn btn-primary shadow-none" type="button" value="cancel" onClick="browse()">
+        </form>
+    </div>
+    <div id="update">
+        <form method="POST" id="updateTip" action="/update-tip-form">
+            <legend><strong>Update Tip</strong></legend>
+
+            <input type="hidden" name="tipID" id="insert-tipID" value="">
+            <label> Protein </label>
+            <input type="text" name="protein" id="insert-protein" value="">
+            <label> Tip </label>
+            <input type="text" name="tipText" id="insert-tipText" value="">
+
+            <input class="btn btn-primary shadow-none" type="submit" id="UpdateSaveTip" value="Update Tip">
+            <input class="btn btn-primary shadow-none" type="button" value="cancel" onClick="browse()">
+        </form>
+    </div>
+    <div id="delete" style="display: block">
+        <form method="POST" id="deleteTip" action="delete-tip-form">
+            <legend><strong>Delete Tip</strong></legend>
+            <fieldset class="fields">
+                <p>Are you sure you wish to delete the following?</p>
+                <label><strong>ID:</strong></label>
+                <label id="deleteTipID-label"></label>
+                <input type="hidden" name="deleteTipID" id="deleteTipID" value="">
+            </fieldset>
+            <input class="btn btn-primary shadow-none" type="submit" id="deleteTipButton" value="Delete Tip">
+            <input class="btn btn-primary shadow-none" type="button" value="cancel" onClick="browse()">
+        </form>
+    </div>
+</div>

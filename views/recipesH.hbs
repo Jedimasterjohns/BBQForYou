@@ -1,0 +1,163 @@
+<script language="JavaScript">
+    function showform(form) {
+        if (form == 'insert') {
+            document.getElementById('browse').style.display = 'none';
+            document.getElementById('insert').style.display = 'block';
+            document.getElementById('update').style.display = 'none';
+            document.getElementById('delete').style.display = 'none';
+
+        }
+        else if (form == 'update') {
+            document.getElementById('browse').style.display = 'none';
+            document.getElementById('insert').style.display = 'none';
+            document.getElementById('update').style.display = 'block';
+            document.getElementById('delete').style.display = 'none';
+
+        }
+        else if (form == 'delete') {
+            document.getElementById('browse').style.display = 'none';
+            document.getElementById('insert').style.display = 'none';
+            document.getElementById('update').style.display = 'none';
+            document.getElementById('delete').style.display = 'block';
+        }
+        else if (form == 'all') {
+            document.getElementById('browse').style.display = 'block';
+            document.getElementById('insert').style.display = 'block';
+            document.getElementById('update').style.display = 'block';
+            document.getElementById('delete').style.display = 'block';
+
+        }
+        else {
+            document.getElementById('browse').style.display = 'block';
+            document.getElementById('insert').style.display = 'none';
+            document.getElementById('update').style.display = 'none';
+            document.getElementById('delete').style.display = 'none';
+        }
+    }
+    function insert() { showform('insert'); }
+    function update(ids) {
+        showform('update');
+        console.log("update ids", ids)
+        document.getElementById('insert-recipeID').value = ids[0]
+        document.getElementById('insert-name').value = ids[1]
+        document.getElementById('insert-time').value = ids[2]
+        document.getElementById('insert-temp').value = ids[3]
+        document.getElementById('insert-ingredients').value = ids[4]
+        document.getElementById('insert-instructions').value = ids[5]
+    }
+    function remove(ids) {
+        showform('delete');
+        console.log(ids)
+        document.getElementById('deleteRecipeID').value = ids
+        document.getElementById('deleteRecipeID-label').textContent = ids
+    }
+    function browse() { showform('browse'); }
+    function showAll() { showform('all'); }
+</script>
+
+
+
+
+<title>Recipes</title>
+<div id="browse">
+    {{!-- <p><a href="#" onClick="showAll()">Display all forms</a> </p> --}}
+    <div class="row justify-content-center">
+        <div class="col-auto">
+            <table id="recipe-table" border="1" cellpadding="5">
+
+                {{!-- Header section --}}
+                <thead>
+
+                    {{!-- For just the first row, we print each key of the row object as a header cell so we know what each column means when the page renders --}}
+                    <tr>
+                        <th><a href="#" onClick="insert()">New</a></th>
+                        <th></th>
+                        {{#each data.[0]}}
+                        <th>
+                            {{@key}}
+                        </th>
+                        {{/each}}
+                    </tr>
+                </thead>
+
+                {{!-- Body section --}}
+                <tbody>
+
+                    {{!-- For each row, print the id, name, time, temp, ingredients, and instructions in recipe --}}
+                    {{#each data}}
+
+                    <tr>
+                        <td><a href="#" onClick="update(['{{this.recipeID}}','{{this.name}}','{{this.time}}','{{this.temp}}','{{this.ingredients}}','{{this.instructions}}'])">Edit</a></td>
+                        <td><a href="#" onclick="remove({{this.recipeID}})">Delete</a></td>
+                        <td>{{this.recipeID}}</td>
+                        <td>{{this.name}}</td>
+                        <td>{{this.time}}</td>
+                        <td>{{this.temp}}</td>
+                        <td>{{this.ingredients}}</td>
+                        <td>{{this.instructions}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+    <p>&nbsp;</p>
+
+</div>
+
+<div id="wrap" class="col-md-12 school-options-dropdown text-center">
+    <div id="insert">
+        <form id="insertRecipe" method="POST" action="/add-recipe-form">
+            <legend><strong>Add Recipe</strong></legend>
+            <fieldset class="fields">
+                <label> Name </label>
+                <input type="text" name="name" id="name">
+                <label> Time </label>
+                <input type="text" name="time" id="time">
+                <label> Temp </label>
+                <input type="text" name="temp" id="temp">
+                <label> Ingredients </label>
+                <input type="text" name="ingredients" id="ingredients">
+                <label> Instructions </label>
+                <input type="text" name="instructions" id="instructions">
+            </fieldset>
+
+            <input class="btn btn-primary shadow-none" type="submit" id="addRecipe" value="Add Recipe">
+            <input class="btn btn-primary shadow-none" type="button" value="cancel" onClick="browse()">
+        </form>
+    </div>
+    <div id="update">
+        <form method="POST" id="updateRecipe" action="/update-recipe-form">
+            <legend><strong>Update Recipe</strong></legend>
+
+            <input type="hidden" name="recipeID" id="insert-recipeID" value="">
+            <label> Name </label>
+            <input type="text" name="name" id="insert-name" value="">
+            <label> Time </label>
+            <input type="text" name="time" id="insert-time" value="">
+            <label> Temp </label>
+            <input type="text" name="temp" id="insert-temp" value="">
+            <label> Ingredients </label>
+            <input type="text" name="ingredients" id="insert-ingredients" value="">
+            <label> Instructions </label>
+            <input type="text" name="instructions" id="insert-instructions" value="">
+
+            <input class="btn btn-primary shadow-none" type="submit" id="UpdateSaveDonut" value="Update Recipe">
+            <input class="btn btn-primary shadow-none" type="button" value="cancel" onClick="browse()">
+        </form>
+    </div>
+    <div id="delete" style="display: block">
+        <form method="POST" id="deleteRecipe" action="delete-recipe-form">
+            <legend><strong>Delete Recipe</strong></legend>
+            <fieldset class="fields">
+                <p>Are you sure you wish to delete the following?</p>
+                <label><strong>ID:</strong></label>
+                <label id="deleteRecipeID-label"></label>
+                <input type="hidden" name="deleteRecipeID" id="deleteRecipeID" value="">
+            </fieldset>
+            <input class="btn btn-primary shadow-none" type="submit" id="deleteRecipeButton" value="Delete Recipe">
+            <input class="btn btn-primary shadow-none" type="button" value="cancel" onClick="browse()">
+        </form>
+    </div>
+</div>
