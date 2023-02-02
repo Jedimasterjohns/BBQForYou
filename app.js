@@ -193,7 +193,10 @@ app.post('/add-recipe-form', function (req, res) {
 
 app.post('/delete-recipe-form', function (req, res) {
 
+    console.log(req.body);
+
     deleteRecipeById(recipeData, req.body.deleteRecipeID);
+    console.log("recipeData ", recipeData);
     res.redirect('/recipesH');
 });
 
@@ -216,13 +219,14 @@ app.post('/add-tip-form', function (req, res) {
         ...req.body,
     };
 
-    recipeData.push(addTip);
+    tipData.push(addTip);
     res.redirect('/tipsH');
 });
 
 app.post('/delete-tip-form', function (req, res) {
 
     deleteTipById(tipData, req.body.deleteTipID);
+    console.log("tipData ", tipData);
     res.redirect('/tipsH');
 });
 
