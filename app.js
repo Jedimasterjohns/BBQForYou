@@ -7,7 +7,7 @@ const util = require('util');
 require('util.promisify').shim();
 
 const fs = require('fs');
-const readFileAsync = util.promisify(fs.readFile);
+const readFileAsync = util
 // Express
 var express = require('express');   // We are using the express library for the web server
 var app = express();            // We need to instantiate an express object to interact with the server in our code
@@ -20,100 +20,56 @@ PORT        = 7364;                 // Set a port number at the top so it's easy
 const { engine } = require('express-handlebars');
 var exphbs = require('express-handlebars');     // Import express-handlebars
 const { time } = require('console');
+const axios = require('axios');
 app.engine('.hbs', engine({ extname: ".hbs" }));  // Create an instance of the handlebars engine to process templates
 app.set('view engine', '.hbs');                 // Tell express to use the handlebars engine whenever it encounters a *.hbs file.
 
-let recipeData = [
-    {
-        recipeID: "1",
-        name: "Whole chicken",
-        time: "3 hrs",
-        temp: "350 F",
-        ingredients: "whole chicken, SPG rub, olive oil",
-        instructions: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore  nisi ut aliquip ex ea commodo consequat.",
-    },
-    {
-        recipeID: "2",
-        name: "Beef Brisket",
-        time: "13 hrs",
-        temp: "225 F",
-        ingredients: "beef brisket, SPG rub, Worcestershire sauce",
-        instructions: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore  nisi ut aliquip ex ea commodo consequat.",
-    },
-    {
-        recipeID: "3",
-        name: "Chicken leg lollipops",
-        time: "1.5 hrs",
-        temp: "400 F",
-        ingredients: "chicken drumsticks, bbq sauce, honey, SPG rub, hot bbq rub",
-        instructions: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore  nisi ut aliquip ex ea commodo consequat.",
-    },
-    {
-        recipeID: "4",
-        name: "Teriyaki flank steak",
-        time: "1 hr",
-        temp: "400 F",
-        ingredients: "flank steak, ter",
-        instructions: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore  nisi ut aliquip ex ea commodo consequat.",
-    },
-    {
-        recipeID: "5",
-        name: "Pulled pork",
-        time: "13 hrs",
-        temp: "225 F",
-        ingredients: "pork shoulder, SPG rub, mustard",
-        instructions: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore  nisi ut aliquip ex ea commodo consequat.",
-    },
-    {
-        recipeID: "6",
-        name: "Beer brats",
-        time: "2 hrs",
-        temp: "325 F",
-        ingredients: "brats, pilsner beer, onions",
-        instructions: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore  nisi ut aliquip ex ea commodo consequat.",
-    },
-    {
-        recipeID: "7",
-        name: "Dino ribs",
-        time: "6 hrs",
-        temp: "225 F",
-        ingredients: "beef plate ribs, SPG rub, olive oil",
-        instructions: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore  nisi ut aliquip ex ea commodo consequat.",
+let recipeData = []
+async function getRecipesFromServer() {
+    try {
+      const response = await axios.get('http://localhost:3000/recipes');
+      if (response.status === 200) {
+        const recipes = response.data.recipes;
+        return recipes;
+      } else {
+        throw new Error(`Request to BBQ Server failed with status code: ${response.status}`);
+      }
+    } catch (error) {
+      console.error(error);
     }
-]
+  }
 
-tipData = [
-    {
-        tipID: "1",
-        protein: "Chicken",
-        tipText: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-    },
-    {
-        tipID: "2",
-        protein: "Beef",
-        tipText: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-    },
-    {
-        tipID: "3",
-        protein: "Lamb",
-        tipText: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-    },
-    {
-        tipID: "4",
-        protein: "Beef",
-        tipText: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-    },
-    {
-        tipID: "5",
-        protein: "Pork",
-        tipText: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-    },
-    {
-        tipID: "6",
-        protein: "Fish",
-        tipText: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+(async () => {
+try {
+    const data = await getRecipesFromServer();
+    recipeData = data;
+} catch (error) {
+    console.error(error.message);
+}
+})();
+
+let tipData = []
+async function getTipsFromServer() {
+    try {
+        const response = await axios.get('http://localhost:3000/tips');
+        if (response.status === 200) {
+        const tips = response.data.tips;
+        return tips;
+        } else {
+        throw new Error(`Request to BBQ Server failed with status code: ${response.status}`);
+        }
+    } catch (error) {
+        console.error(error);
     }
-]
+  }
+(async () => {
+try {
+    const data = await getTipsFromServer();
+    tipData = data;
+} catch (error) {
+    console.error(error.message);
+}
+})();
 
 function deleteRecipeById(recipes, recipeID) {
     let index = -1;
@@ -159,10 +115,6 @@ function updateTipById(tips, tipID, updatedTip) {
     }
 }
 
-/*
-    ROUTES
-*/
-
 app.get('/', function (req, res) {
     
     res.render('home');
@@ -175,7 +127,6 @@ app.get('/home', function (req, res) {
 });
 
 app.get('/recipesH', function (req, res) {
-
     let data = recipeData;
     res.render('recipesH', { data: data });
 });
@@ -207,7 +158,6 @@ app.post('/update-recipe-form', function (req, res) {
 });
 
 app.get('/tipsH', function (req, res) {
-
     let data = tipData;
     res.render('tipsH', { data: data });
 });
